@@ -6,7 +6,7 @@ class DatabaseManager {
         this.isInitialized = false;
     }
 
-    // Inicializar o banco de dados
+
     async init() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, this.dbVersion);
@@ -21,7 +21,6 @@ class DatabaseManager {
                 this.isInitialized = true;
                 console.log('✅ Banco de dados inicializado com sucesso');
                 
-                // Verificar se precisa popular dados iniciais
                 this.checkAndSeedInitialData().then(resolve);
             };
             
@@ -30,8 +29,7 @@ class DatabaseManager {
                 const oldVersion = event.oldVersion;
                 
                 console.log(`Atualizando banco de versão ${oldVersion} para ${this.dbVersion}`);
-                
-                // Criar object store de alunos
+
                 if (!db.objectStoreNames.contains('alunos')) {
                     const alunoStore = db.createObjectStore('alunos', { 
                         keyPath: 'id', 
@@ -43,7 +41,6 @@ class DatabaseManager {
                     alunoStore.createIndex('created_at', 'created_at');
                 }
                 
-                // Criar object store de histórico
                 if (!db.objectStoreNames.contains('historico')) {
                     const historyStore = db.createObjectStore('historico', { 
                         keyPath: 'id', 
@@ -55,7 +52,6 @@ class DatabaseManager {
                     historyStore.createIndex('data', 'data');
                 }
                 
-                // Criar object store de configurações
                 if (!db.objectStoreNames.contains('configuracoes')) {
                     db.createObjectStore('configuracoes', { keyPath: 'chave' });
                 }
@@ -63,7 +59,6 @@ class DatabaseManager {
         });
     }
     
-    // Verificar e popular dados iniciais se necessário
     async checkAndSeedInitialData() {
         const alunos = await this.getAllAlunos();
         
@@ -83,7 +78,6 @@ class DatabaseManager {
             console.log(`✅ ${exemplos.length} alunos de exemplo adicionados`);
         }
         
-        // Verificar configurações iniciais
         const theme = await this.getConfig('theme');
         if (!theme) {
             await this.setConfig('theme', 'light');
@@ -133,7 +127,6 @@ class DatabaseManager {
                     );
                 }
                 
-                // Ordenar por nome
                 alunos.sort((a, b) => a.nome.localeCompare(b.nome));
                 resolve(alunos);
             };
@@ -193,10 +186,8 @@ class DatabaseManager {
             const alunoStore = transaction.objectStore('alunos');
             const historyStore = transaction.objectStore('historico');
             
-            // Deletar aluno
             const deleteAluno = alunoStore.delete(id);
             
-            // Deletar histórico relacionado
             const historyIndex = historyStore.index('aluno_id');
             const historyRequest = historyIndex.openCursor(IDBKeyRange.only(id));
             
@@ -326,7 +317,6 @@ class DatabaseManager {
         
         const ultimoPasse = historico.length > 0 ? historico[0] : null;
         
-        // Calcular média de passes por aluno
         const alunoIds = new Set(historico.map(h => h.aluno_id));
         const mediaPasses = alunoIds.size > 0 ? (historico.length / alunoIds.size).toFixed(1) : 0;
         
@@ -370,19 +360,16 @@ class DatabaseManager {
     
     async importBackup(backup) {
         try {
-            // Limpar dados existentes
             await this.clearAllData();
             
-            // Importar alunos
+  
             if (backup.alunos && backup.alunos.length) {
                 for (const aluno of backup.alunos) {
-                    // Remover IDs para evitar conflitos
                     const { id, ...alunoSemId } = aluno;
                     await this.addAluno(alunoSemId);
                 }
             }
             
-            // Importar histórico
             if (backup.historico && backup.historico.length) {
                 for (const item of backup.historico) {
                     const { id, ...itemSemId } = item;
@@ -403,8 +390,7 @@ class DatabaseManager {
         for (const aluno of alunos) {
             await this.deleteAluno(aluno.id);
         }
-        
-        // Limpar configurações
+
         const configs = await this.getAllConfigs();
         const transaction = this.db.transaction(['configuracoes'], 'readwrite');
         const store = transaction.objectStore('configuracoes');
@@ -434,5 +420,4 @@ class DatabaseManager {
     }
 }
 
-// Instância global do banco de dados
 const db = new DatabaseManager();
