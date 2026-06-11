@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Sistema profissional de controle de acesso ao intervalo escolar">
+    <title>PassManager Pro | Sistema de Controle de Intervalo</title>
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Premium -->
+        <header class="header-premium">
+            <div class="header-content">
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <i class="fas fa-passport"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>PassManager <span>Pro</span></h1>
+                        <p>Controle inteligente de acesso ao intervalo</p>
+                    </div>
+                </div>
+                <div class="stats-area">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statAlunos">0</span>
+                            <span class="stat-label">Alunos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-ticket-alt"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statPasses">0</span>
+                            <span class="stat-label">Passes Hoje</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-history"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="statTotal">0</span>
+                            <span class="stat-label">Total Emissões</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Tabs de Navegação -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="cadastro">
+                    <i class="fas fa-user-graduate"></i> Cadastro
+                </button>
+                <button class="tab-btn" data-tab="lista">
+                    <i class="fas fa-list-ul"></i> Alunos
+                </button>
+                <button class="tab-btn" data-tab="historico">
+                    <i class="fas fa-clock"></i> Histórico
+                </button>
+                <button class="tab-btn" data-tab="config">
+                    <i class="fas fa-cog"></i> Configurações
+                </button>
+            </div>
+
+            <div class="tab-content active" id="tab-cadastro">
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-plus"></i> Cadastro de Estudante</h2>
+                        <p>Preencha os dados abaixo para registrar um novo aluno</p>
+                    </div>
+                    <form id="studentForm" class="form-premium">
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label><i class="fas fa-user"></i> Nome Completo *</label>
+                                <input type="text" id="nome" placeholder="Digite o nome completo" required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-id-card"></i> CPF</label>
+                                <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-qrcode"></i> Matrícula *</label>
+                                <input type="text" id="matricula" placeholder="Número da matrícula" required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-graduation-cap"></i> Curso *</label>
+                                <input type="text" id="curso" placeholder="Ex: Engenharia, Medicina..." required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-layer-group"></i> Série/Turma *</label>
+                                <input type="text" id="serie" placeholder="Ex: 3° Ano A" required>
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-envelope"></i> E-mail *</label>
+                                <input type="email" id="email" placeholder="estudante@escola.com" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Cadastrar Aluno
+                            </button>
+                            <button type="button" id="btnLimparForm" class="btn btn-outline">
+                                <i class="fas fa-eraser"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h2><i class="fas fa-database"></i> Dados de Exemplo</h2>
+                        <p>Carregue alunos de exemplo para testar o sistema</p>
+                    </div>
+                    <div class="example-buttons">
+                        <button id="btnLoadExamples" class="btn btn-secondary">
+                            <i class="fas fa-file-import"></i> Carregar Exemplos
+                        </button>
+                        <button id="btnClearAll" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Limpar Todos os Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-lista">
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Registro Acadêmico</h2>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchStudent" placeholder="Buscar por nome ou matrícula...">
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="student-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Matrícula</th>
+                                    <th>Curso</th>
+                                    <th>Série</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsList">
+                                <tr>
+                                    <td colspan="5" class="loading-placeholder">
+                                        <i class="fas fa-spinner fa-spin"></i> Carregando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Histórico -->
+            <div class="tab-content" id="tab-historico">
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history"></i> Histórico de Emissões</h2>
+                        <button id="btnExportHistory" class="btn btn-outline btn-sm">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                    <div id="historyList" class="history-timeline">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>Nenhum passe emitido ainda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-config">
+                <div class="card-modern">
+                    <div class="card-header">
+                        <h2><i class="fas fa-cog"></i> Configurações do Sistema</h2>
+                    </div>
+                    
+                    <div class="config-section">
+                        <h3><i class="fas fa-database"></i> Backup e Restauração</h3>
+                        <div class="config-actions">
+                            <button id="btnExportBackup" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Exportar Backup
+                            </button>
+                            <button id="btnImportBackup" class="btn btn-secondary">
+                                <i class="fas fa-upload"></i> Importar Backup
+                            </button>
+                            <input type="file" id="fileImport" accept=".json" style="display: none;">
+                        </div>
+                        <p class="config-hint"><i class="fas fa-info-circle"></i> O backup contém todos os alunos e histórico de emissões</p>
+                    </div>
+
+                    <div class="config-section">
+                        <h3><i class="fas fa-chart-line"></i> Estatísticas do Sistema</h3>
+                        <div class="stats-details" id="statsDetails">
+                            <div class="stat-row">
+                                <span>Total de alunos cadastrados:</span>
+                                <strong id="statsTotalAlunos">0</strong>
+                            </div>
+                            <div class="stat-row">
+                                <span>Total de passes emitidos:</span>
+                                <strong id="statsTotalPasses">0</strong>
+                            </div>
+                            <div class="stat-row">
+                                <span>Média de passes por aluno:</span>
+                                <strong id="statsMediaPasses">0</strong>
+                            </div>
+                            <div class="stat-row">
+                                <span>Última emissão:</span>
+                                <strong id="statsUltimoPasse">Nenhum</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3><i class="fas fa-palette"></i> Aparência</h3>
+                        <div class="theme-buttons">
+                            <button class="theme-btn" data-theme="light">
+                                <i class="fas fa-sun"></i> Claro
+                            </button>
+                            <button class="theme-btn" data-theme="dark">
+                                <i class="fas fa-moon"></i> Escuro
+                            </button>
+                            <button class="theme-btn" data-theme="auto">
+                                <i class="fas fa-mobile-alt"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3><i class="fas fa-info-circle"></i> Sobre</h3>
+                        <div class="about-info">
+                            <p><strong>PassManager Pro</strong> - Versão 2.0.0</p>
+                            <p>Sistema profissional de controle de acesso ao intervalo escolar</p>
+                            <p><i class="fas fa-database"></i> Banco de dados: IndexedDB</p>
+                            <p><i class="fas fa-shield-alt"></i> Dados salvos localmente no seu navegador</p>
+                            <hr>
+                            <p><small>Desenvolvido com <i class="fas fa-heart"></i> para gestão educacional</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="passModal" class="modal">
+            <div class="modal-content pass-premium">
+                <div class="modal-header">
+                    <div class="pass-badge">
+                        <i class="fas fa-check-circle"></i> PASSE LIBERADO
+                    </div>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="pass-body">
+                    <div class="pass-header">
+                        <i class="fas fa-school pass-icon"></i>
+                        <h2>PassManager Pro</h2>
+                        <p>Autorização de Saída - Intervalo</p>
+                    </div>
+                    <div class="pass-details">
+                        <div class="pass-row">
+                            <span class="pass-label"><i class="fas fa-user"></i> Aluno:</span>
+                            <span class="pass-value" id="passNome">---</span>
+                        </div>
+                        <div class="pass-row">
+                            <span class="pass-label"><i class="fas fa-id-card"></i> CPF:</span>
+                            <span class="pass-value" id="passCpf">---</span>
+                        </div>
+                        <div class="pass-row">
+                            <span class="pass-label"><i class="fas fa-qrcode"></i> Matrícula:</span>
+                            <span class="pass-value" id="passMatricula">---</span>
+                        </div>
+                        <div class="pass-row">
+                            <span class="pass-label"><i class="fas fa-graduation-cap"></i> Curso:</span>
+                            <span class="pass-value" id="passCurso">---</span>
+                        </div>
+                        <div class="pass-row">
+                            <span class="pass-label"><i class="fas fa-layer-group"></i> Série:</span>
+                            <span class="pass-value" id="passSerie">---</span>
+                        </div>
+                    </div>
+                    <div class="pass-code">
+                        <label>Código de Verificação</label>
+                        <div class="code-display">
+                            <span id="passCodigo">XXXX-XXXX</span>
+                            <button id="btnCopyCode" class="btn-icon" title="Copiar código">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pass-footer">
+                        <div class="pass-date">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="passData">--/--/---- --:--</span>
+                        </div>
+                        <div class="pass-signature">
+                            <i class="fas fa-signature"></i> Autorizado pelo sistema
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="btnPrintPass" class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button id="btnSimulateEmail" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i> Enviar por E-mail
+                    </button>
+                    <button id="btnCloseModal" class="btn btn-outline">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast" class="toast">
+            <div class="toast-content">
+                <i class="fas fa-bell"></i>
+                <span id="toastMessage">Mensagem</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
